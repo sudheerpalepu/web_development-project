@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 
 from app.database import database
+
 from app.routes.careers import router as careers_router
+from app.routes.jobs import router as jobs_router
+from app.routes.analytics import router as analytics_router
 
 app = FastAPI(
     title="Career Guide Dashboard API",
@@ -9,6 +12,8 @@ app = FastAPI(
 )
 
 app.include_router(careers_router)
+app.include_router(jobs_router)
+app.include_router(analytics_router)
 
 
 @app.get("/")
@@ -19,7 +24,7 @@ async def home():
 
 
 @app.get("/test-db")
-async def test_db():
+async def test_database():
     collections = await database.list_collection_names()
 
     return {
