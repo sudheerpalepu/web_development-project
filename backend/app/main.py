@@ -8,10 +8,18 @@ from app.routes.analytics import router as analytics_router
 from app.routes.predictions import router as predictions_router
 from app.routes.dashboard import router as dashboard_router
 from app.routes.favorites import router as favorites_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Career Guide Dashboard API",
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 app.include_router(dashboard_router)
 app.include_router(favorites_router)
