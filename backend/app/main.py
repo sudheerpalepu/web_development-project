@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+from app.routes.predictions import router as predictions_router
 from app.database import database
 
 from app.routes.careers import router as careers_router
@@ -10,6 +10,7 @@ app = FastAPI(
     title="Career Guide Dashboard API",
     version="1.0.0"
 )
+app.include_router(predictions_router)
 
 app.include_router(careers_router)
 app.include_router(jobs_router)
