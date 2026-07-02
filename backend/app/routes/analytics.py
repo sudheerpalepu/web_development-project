@@ -1,6 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from collections import Counter
 
+from fastapi import Depends
+from app.utils.auth import get_current_user
+
 from app.database import jobs_collection
 
 router = APIRouter(
@@ -10,7 +13,10 @@ router = APIRouter(
 
 
 @router.get("/{domain}")
-async def get_career_analytics(domain: str):
+async def get_career_analytics(
+    domain: str,
+    current_user: dict = Depends(get_current_user)
+):
     jobs = []
 
     async for job in jobs_collection.find({"domain": domain}):

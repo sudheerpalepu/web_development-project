@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
+from fastapi import Depends
+from app.utils.auth import get_current_user
+
 from app.services.job_api_service import fetch_jobs
 from app.database import jobs_collection
 
@@ -10,7 +13,10 @@ router = APIRouter(
 
 
 @router.get("/fetch/{domain}")
-async def fetch_jobs_from_api(domain: str):
+async def fetch_jobs(
+    domain: str,
+    current_user: dict = Depends(get_current_user)
+):
 
     data = fetch_jobs(domain)
 

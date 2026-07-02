@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException
+from fastapi import Depends
+from app.utils.auth import get_current_user
 
 from app.database import jobs_collection
 from app.services.prediction_service import calculate_prediction
@@ -10,7 +12,10 @@ router = APIRouter(
 
 
 @router.get("/{domain}")
-async def predict_career_scope(domain: str):
+async def predict_career_scope(
+    domain: str,
+    current_user: dict = Depends(get_current_user)
+):
     jobs = []
 
     async for job in jobs_collection.find({"domain": domain}):
