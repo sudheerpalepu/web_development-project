@@ -1,6 +1,7 @@
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Predictions from "./pages/Predictions";
 import "./App.css";
 
 function App() {
@@ -15,6 +16,9 @@ function App() {
       <hr />
 
       <Dashboard />
+      <hr />
+
+      <Predictions />
     </div>
   );
 }

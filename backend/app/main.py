@@ -8,6 +8,7 @@ from app.routes.analytics import router as analytics_router
 from app.routes.predictions import router as predictions_router
 from app.routes.dashboard import router as dashboard_router
 from app.routes.favorites import router as favorites_router
+from app.routes.search import router as search_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(search_router)
 app.include_router(dashboard_router)
 app.include_router(favorites_router)
 app.include_router(auth_router)
