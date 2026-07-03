@@ -1,47 +1,75 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import StatsCard from "../components/StatsCard";
 
 function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
 
   useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard = async () => {
     const token = localStorage.getItem("token");
 
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
-    api
-      .get("/dashboard/", {
+    try {
+      const response = await api.get("/dashboard/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then((response) => {
-        setDashboard(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-        localStorage.removeItem("token");
       });
-  }, []);
 
-  if (!localStorage.getItem("token")) {
-    return <p>Please login to view dashboard.</p>;
-  }
+      setDashboard(response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   if (!dashboard) {
-    return <p>Loading dashboard...</p>;
+    return <h2>Loading Dashboard...</h2>;
   }
 
   return (
     <div>
-      <h2>Career Guide Dashboard</h2>
-      <p>Name: {dashboard.user.name}</p>
-      <p>Email: {dashboard.user.email}</p>
-      <p>Saved Careers: {dashboard.saved_careers}</p>
-      <p>Saved Jobs: {dashboard.saved_jobs}</p>
-      <p>Total Jobs: {dashboard.total_jobs_in_database}</p>
+
+      <h1>Dashboard</h1>
+
+      <div className="stats-grid">
+
+        <StatsCard
+          title="Saved Careers"
+          value={dashboard.saved_careers}
+        />
+
+        <StatsCard
+          title="Saved Jobs"
+          value={dashboard.saved_jobs}
+        />
+
+        <StatsCard
+          title="Total Jobs"
+          value={dashboard.total_jobs_in_database}
+        />
+
+        <StatsCard
+          title="Role"
+          value={dashboard.user.role}
+        />
+
+      </div>
+
+      <div className="card">
+
+        <h2>User Details</h2>
+
+        <p><b>Name:</b> {dashboard.user.name}</p>
+
+        <p><b>Email:</b> {dashboard.user.email}</p>
+
+      </div>
+
     </div>
   );
 }

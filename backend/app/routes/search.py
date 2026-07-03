@@ -39,9 +39,16 @@ async def search_career(
                 "title": job.get("title"),
                 "company": job.get("company", {}).get("display_name"),
                 "location": job.get("location", {}).get("display_name"),
+                "description": job.get("description"),
                 "salary_min": job.get("salary_min"),
                 "salary_max": job.get("salary_max"),
+                "contract_time": job.get("contract_time"),
+                "contract_type": job.get("contract_type"),
+                "category": job.get("category", {}).get("label"),
+                "created": job.get("created"),
                 "redirect_url": job.get("redirect_url"),
+                "latitude": job.get("latitude"),
+                "longitude": job.get("longitude"),
                 "source": "Adzuna"
             }
 
