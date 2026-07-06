@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "../services/api";
 
 function Favorites() {
@@ -8,7 +8,7 @@ function Favorites() {
 
   const token = localStorage.getItem("token");
 
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
     if (!token) {
       setMessage("Please login to view favorites.");
       return;
@@ -29,7 +29,7 @@ function Favorites() {
       console.error(error);
       setMessage("Unable to load favorites.");
     }
-  };
+  }, [token]);
 
   const deleteFavorite = async (favoriteId) => {
     try {
@@ -47,19 +47,25 @@ function Favorites() {
 
   useEffect(() => {
     loadFavorites();
-  }, []);
+  }, [loadFavorites]);
 
   return (
     <div className="page">
-      <h1>Favorites</h1>
+      <div className="page-header">
+        <h1>Favorites</h1>
+        <p>
+          Review saved career domains and jobs without losing context from your
+          search results.
+        </p>
+      </div>
 
-      {message && <p>{message}</p>}
+      {message && <div className="empty-state">{message}</div>}
 
       <div className="card">
         <h2>Favorite Careers</h2>
 
         {careers.length === 0 ? (
-          <p>No favorite careers saved yet.</p>
+          <div className="empty-state">No favorite careers saved yet.</div>
         ) : (
           careers.map((career) => (
             <div className="favorite-item" key={career._id}>
@@ -68,7 +74,10 @@ function Favorites() {
                 <p>Saved career domain</p>
               </div>
 
-              <button onClick={() => deleteFavorite(career._id)}>
+              <button
+                className="danger-button"
+                onClick={() => deleteFavorite(career._id)}
+              >
                 Delete
               </button>
             </div>
@@ -80,7 +89,7 @@ function Favorites() {
         <h2>Favorite Jobs</h2>
 
         {jobs.length === 0 ? (
-          <p>No favorite jobs saved yet.</p>
+          <div className="empty-state">No favorite jobs saved yet.</div>
         ) : (
           jobs.map((job) => (
             <div className="favorite-item" key={job._id}>
@@ -90,7 +99,10 @@ function Favorites() {
                 <p><b>Location:</b> {job.location}</p>
               </div>
 
-              <button onClick={() => deleteFavorite(job._id)}>
+              <button
+                className="danger-button"
+                onClick={() => deleteFavorite(job._id)}
+              >
                 Delete
               </button>
             </div>

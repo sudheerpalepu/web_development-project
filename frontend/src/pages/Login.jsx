@@ -23,24 +23,27 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h2>Welcome back</h2>
+        <p className="muted">Login to view your dashboard and saved careers.</p>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <button type="submit">Login</button>
-      </form>
+          <button type="submit">Login</button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -10,6 +10,62 @@ router = APIRouter(
     tags=["Career Search"]
 )
 
+RELATED_ROLE_QUERIES = {
+    "data science": [
+        "Data Science",
+        "Data Scientist",
+        "Data Analyst",
+        "Data Engineer",
+        "Machine Learning Engineer",
+        "Business Intelligence Analyst",
+    ],
+    "cloud": [
+        "Cloud",
+        "Cloud Engineer",
+        "DevOps Engineer",
+        "AWS Engineer",
+        "Azure Engineer",
+        "Cloud Architect",
+    ],
+    "cyber security": [
+        "Cyber Security",
+        "Cybersecurity Analyst",
+        "Security Engineer",
+        "Information Security Analyst",
+        "SOC Analyst",
+        "Penetration Tester",
+    ],
+    "cybersecurity": [
+        "Cybersecurity",
+        "Cybersecurity Analyst",
+        "Security Engineer",
+        "Information Security Analyst",
+        "SOC Analyst",
+        "Penetration Tester",
+    ],
+    "ai": [
+        "AI",
+        "AI Engineer",
+        "Machine Learning Engineer",
+        "NLP Engineer",
+        "Computer Vision Engineer",
+        "MLOps Engineer",
+    ],
+    "artificial intelligence": [
+        "Artificial Intelligence",
+        "AI Engineer",
+        "Machine Learning Engineer",
+        "NLP Engineer",
+        "Computer Vision Engineer",
+        "MLOps Engineer",
+    ],
+}
+
+
+def role_queries_for_domain(domain: str) -> list[str]:
+    normalized_domain = domain.strip().lower()
+    return RELATED_ROLE_QUERIES.get(normalized_domain, [domain])
+
 
 @router.get("/{domain}")
 async def search_career(
@@ -22,20 +78,33 @@ async def search_career(
         job["_id"] = str(job["_id"])
         jobs.append(job)
 
-    if len(jobs) == 0:
-        data = fetch_jobs(domain)
+    existing_queries = {
+        job.get("search_query") or job.get("domain")
+        for job in jobs
+    }
+    queries_to_fetch = [
+        query
+        for query in role_queries_for_domain(domain)
+        if query not in existing_queries
+    ]
+
+    for query in queries_to_fetch:
+        data = fetch_jobs(query)
 
         if data is None or "results" not in data:
-            raise HTTPException(
-                status_code=400,
-                detail="Unable to fetch jobs for this domain"
-            )
+            if len(jobs) == 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Unable to fetch jobs for this domain"
+                )
+            continue
 
         new_jobs = []
 
         for job in data.get("results", []):
             document = {
                 "domain": domain,
+                "search_query": query,
                 "title": job.get("title"),
                 "company": job.get("company", {}).get("display_name"),
                 "location": job.get("location", {}).get("display_name"),
@@ -60,7 +129,7 @@ async def search_career(
             for index, job in enumerate(new_jobs):
                 job["_id"] = str(result.inserted_ids[index])
 
-            jobs = new_jobs
+            jobs.extend(new_jobs)
 
     salaries = []
 
