@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -8,18 +10,34 @@ from app.utils.auth import hash_password, verify_password, create_access_token
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
+async def find_user_by_email(email: str):
+    normalized_email = email.strip().lower()
+    existing_user = await users_collection.find_one({"email": normalized_email})
+
+    if existing_user:
+        return existing_user
+
+    return await users_collection.find_one(
+        {"email": {"$regex": f"^{re.escape(normalized_email)}$", "$options": "i"}}
+    )
+
+
 @router.post("/register")
 async def register_user(user: UserRegister):
-    existing_user = await users_collection.find_one({"email": user.email})
+    email = user.email.strip().lower()
+    name = user.name.strip()
+    role = user.role if user.role in {"user", "admin"} else "user"
+
+    existing_user = await find_user_by_email(email)
 
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     user_data = {
-        "name": user.name,
-        "email": user.email,
+        "name": name,
+        "email": email,
         "password": hash_password(user.password),
-        "role": user.role
+        "role": role
     }
 
     result = await users_collection.insert_one(user_data)
@@ -27,13 +45,13 @@ async def register_user(user: UserRegister):
     return {
         "message": "User registered successfully",
         "user_id": str(result.inserted_id),
-        "role": user.role
+        "role": role
     }
 
 
 @router.post("/login")
 async def login_user(form_data: OAuth2PasswordRequestForm = Depends()):
-    existing_user = await users_collection.find_one({"email": form_data.username})
+    existing_user = await find_user_by_email(form_data.username)
 
     if not existing_user:
         raise HTTPException(status_code=401, detail="Invalid email or password")

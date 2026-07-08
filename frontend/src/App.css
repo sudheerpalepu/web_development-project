@@ -221,6 +221,17 @@ form {
   gap: 14px;
 }
 
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 input,
 select,
 textarea {
